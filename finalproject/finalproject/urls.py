@@ -22,4 +22,5 @@ urlpatterns = [
     path('',views.SignupPage, name='signup'),
     path('login/',views.LoginPage,name='login'),
     path('home/',views.HomePage,name='home'),
+    #logout to be added
 ]

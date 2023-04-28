@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +11,9 @@
     <link rel="stylesheet" href="{% static 'register.css'%}">
 </head>
 <body>
+
+
+  {% block content %}
     <div class="login-page">
         <div class="form">
           <div class="login">
@@ -18,14 +22,25 @@
               <p>Please enter your details to register.</p>
             </div>
           </div>
-          <form class="login-form">
+          <form class="login-form" method="POST">
+            {% csrf_token %}
+            <!-- validations bakiii!!! -->
             <input type="text" placeholder="Your Name" name="name"/>
-            <input type="password" placeholder="Email" name="email"/>
+            <input type="email" placeholder="Email" name="email"/>
             <input type="password" placeholder="Password" name="password"/>
             <input type="password" placeholder="Repeat your password" name="password_repeat"/>
-            <button>Register</button>
-            <p class="message">Already registered? <a href="login.html">Login</a></p>
+            <!-- <button>Register</button> -->
+            <input type="submit" value="Register"/>
+            {% if messages %}
+            <ul class="messages">
+              {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+            <p class="message">Already registered? <a href="{% url 'login' %}">Login</a></p>
           </form>
+          {% endblock %}
         </div>
       </div>
 </body>
