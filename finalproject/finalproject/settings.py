@@ -78,6 +78,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'database',
+        'HOST': 'localhost',
+        'PORT': 27017,
+        'AUTH_SOURCE': 'admin',
+        'USERNAME': 'myuser',
+        'PASSWORD': 'mypassword',
+        'AUTH_MECHANISM': 'SCRAM-SHA-1',
     }
 }
 

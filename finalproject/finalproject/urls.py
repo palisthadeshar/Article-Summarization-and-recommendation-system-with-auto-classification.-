@@ -19,8 +19,8 @@ from demoapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.SignupPage, name='signup'),
+    path('signup/',views.SignupPage, name='signup'),
     path('login/',views.LoginPage,name='login'),
-    path('home/',views.HomePage,name='home'),
+    path('',views.HomePage,name='home'),
     #logout to be added
 ]

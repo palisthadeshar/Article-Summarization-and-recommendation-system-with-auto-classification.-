@@ -1,3 +1,5 @@
+
+{% block start %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,7 +9,8 @@
 </head>
 <body>
   <body>
-    <div class="login-page">
+    {% include 'navbar.html' %}
+    <div class="login-page" >
       <div class="form">
         <div class="login">
           <div class="login-header">
@@ -15,14 +18,33 @@
             <p>Login to summarize your articles and get recommendations.</p>
           </div>
         </div>
-        <form class="login-form">
-          <input type="text" placeholder="username"/>
-          <input type="password" placeholder="password"/>
-          <button>login</button>
-          <p class="message">Not registered? <a href="#">Sign up</a></p>
+        <form class="login-form" method="POST">
+          {% csrf_token %}
+          <input type="text" placeholder="username" name="name"/>
+          <input type="password" placeholder="password" name="password"/>
+          <input type="submit"  value="Login" style="background-image: linear-gradient(45deg,black,	#36454F); color: white; cursor: pointer;"/>
+     
+          <p class="message">Not registered? <a href="{% url 'signup' %}">Sign up</a></p>
         </form>
+        <!-- login sucess msggg -->
+        {% for message in messages %}
+                <div class="alert alert-danger" role="alert">
+                    {{message}}
+                </div>
+                {% endfor %}
       </div>
     </div>
-</body>
+    {% endblock start %}
+ <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
 </body>
 </html>

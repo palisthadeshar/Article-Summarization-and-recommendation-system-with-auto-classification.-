@@ -8,7 +8,9 @@
   }
   
   .nav {
-    height: 50px;
+    display: block !important;
+    /* position: sticky; */
+    height: 60px;
     width: 100%;
     background-color: black;
     position: relative;

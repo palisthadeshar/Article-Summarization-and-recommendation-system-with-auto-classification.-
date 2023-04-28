@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{% static 'register.css'%}">
 </head>
 <body>
+  {% include 'navbar.html' %}
 
 
   {% block content %}
@@ -30,7 +31,7 @@
             <input type="password" placeholder="Password" name="password"/>
             <input type="password" placeholder="Repeat your password" name="password_repeat"/>
             <!-- <button>Register</button> -->
-            <input type="submit" value="Register"/>
+            <input type="submit"  value="Register" style="background-image: linear-gradient(45deg,black,	#36454F); color: white; cursor: pointer;"/>
             {% if messages %}
             <ul class="messages">
               {% for message in messages %}

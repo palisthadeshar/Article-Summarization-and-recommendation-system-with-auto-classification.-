@@ -37,7 +37,7 @@ margin-bottom: 26px;
   box-sizing: border-box;
   font-size: 14px;
 }
-.form button {
+/* .form button {
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
   outline: 0;
@@ -51,7 +51,7 @@ margin-bottom: 26px;
   -webkit-transition: all 0.3 ease;
   transition: all 0.3 ease;
   cursor: pointer;
-}
+} */
 .form .message {
   margin: 15px 0 0;
   color: #b3b3b3;
