@@ -12,9 +12,10 @@
 </head>
 <body>
   {% include 'navbar.html' %}
+  {% block content %}  
 
 
-  {% block content %}
+ 
     <div class="login-page">
         <div class="form">
           <div class="login">
@@ -25,8 +26,9 @@
           </div>
           <form class="login-form" method="POST">
             {% csrf_token %}
+          
             <!-- validations bakiii!!! -->
-            <input type="text" placeholder="Your Name" name="name"/>
+            <input type="text" placeholder="Your Name" name="username"/>
             <input type="email" placeholder="Email" name="email"/>
             <input type="password" placeholder="Password" name="password"/>
             <input type="password" placeholder="Repeat your password" name="password_repeat"/>
