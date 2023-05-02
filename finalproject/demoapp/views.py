@@ -7,10 +7,17 @@ from pymongo import MongoClient
 from django.contrib.auth import logout
 from django.contrib.auth.models import User, auth
 from .models import *
+import pymongo
 
 # Create your views here.
 def HomePage(request):
-    return render (request,'home.html')
+    client = pymongo.MongoClient("mongodb://localhost:27017/")
+    db = client["database"]
+    collection = db["ARTICLE"]
+    data = collection.find()
+    # for document in data:
+    #     print(document)
+    return render (request,'home.html',{ "data": data })
 
 def SignupPage(request):
       
@@ -57,3 +64,6 @@ def LoginPage(request):
 def LogoutPage(request):
     logout(request)
     return redirect('home')
+
+def Summary(request):
+    return render(request,'summarizerpage.html')
