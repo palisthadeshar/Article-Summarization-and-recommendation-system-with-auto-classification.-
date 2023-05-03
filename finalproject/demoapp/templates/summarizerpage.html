@@ -19,14 +19,13 @@
             <div class="form" class="col-md-6">
                 <div class="Summarize">
                   <div class="header">
-                    <h3>Title</h3>
-                    <h4>some text</h4>
+                    <h3>{{summarypage.Title}}</h3>
                   </div>
                 </div>
                 <form>
-                    <textarea></textarea>
+                    <textarea>{{summarypage.Content}}</textarea>
                  
-                 
+                    <!-- {{ summarypage|pprint }}  -->
                   <button type="submit">Summarize</button>
                   
                 </form>

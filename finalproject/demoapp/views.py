@@ -6,8 +6,12 @@ from django.contrib.auth.forms import AuthenticationForm
 from pymongo import MongoClient
 from django.contrib.auth import logout
 from django.contrib.auth.models import User, auth
-from .models import *
 import pymongo
+from django.shortcuts import render, get_object_or_404
+# from .models import Article
+from bson import ObjectId
+from django.http import Http404
+
 
 # Create your views here.
 def HomePage(request):
@@ -18,6 +22,25 @@ def HomePage(request):
     # for document in data:
     #     print(document)
     return render (request,'home.html',{ "data": data })
+
+def Summary(request,slug):
+    try:
+        client = MongoClient('mongodb://localhost:27017/')
+        db = client['database']
+        collection = db['ARTICLE']
+        
+        if slug is not None:
+            # print(slug)
+            summarypage = collection.find_one({'slug': slug})
+            
+            # summarypage = get_object_or_404(collection, {'slug': slug})
+            context = {'summarypage': summarypage}
+            return render(request, 'summarizerpage.html', context)
+            
+           
+    except Exception as e:
+        return render(request, '404.html')
+   
 
 def SignupPage(request):
       
@@ -65,5 +88,24 @@ def LogoutPage(request):
     logout(request)
     return redirect('home')
 
-def Summary(request):
-    return render(request,'summarizerpage.html')
+
+    # client = MongoClient('mongodb://localhost:27017/')
+    # db = client['database']
+    # collection = db['ARTICLE']
+    
+    # if slug is not None:
+    #     summarypage = get_object_or_404(collection, {'slug': slug})
+    #     try:
+    #         summarypage = collection.objects.get(slug=slug)
+    #     except:
+    #         raise Http404
+    # context = {'summarypage': summarypage}
+    # return render(request,'summarizerpage.html',context)
+    
+    # title = request.GET.get("title")
+    # content = request.GET.get("content")
+    # return render(request,'summarizerpage.html',{ "title":title, "content": content }) 
+
+
+
+    

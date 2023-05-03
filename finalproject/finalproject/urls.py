@@ -23,6 +23,7 @@ urlpatterns = [
     path('signup/',views.SignupPage, name='signup'),
     path('login/',views.LoginPage,name='login'),
     path('home/',views.LogoutPage,name='logout'),
-    path('Summary/',views.Summary,name='summarypage'),
+    path('summarypage/<slug:slug>/',views.Summary,name='summarypage'),
+    # path('summarypage/',views.Summary,name='summarypage'),
    
 ]

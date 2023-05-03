@@ -14,17 +14,33 @@
 </head>
 <body>
   {% include 'navbar.html' %}
-  
+
   {% for document in data %}
-    <div class="card-group">
-        <div class="card text-white m-3">
-          <div class="card-body">
-            <h5 class="card-title">{{document.Title}}</h5>
-            <p class="card-text">{{document.Content | truncatewords:30}}</p>
-            <a href="{% url 'summarypage' %}" class="btn-card">Read More</a>
-          </div>
-        </div>
-    {% endfor %}
+  <div class="card-group">
+    <div class="card text-white m-3">
+      <div class="card-body">
+        <h5 class="card-title">{{document.Title}}</h5>
+        <p class="card-text">{{document.Content | truncatewords:30}}</p>
+        <button onclick="window.location='/summarypage/{{ document.slug}}/'" class="btn-card">Read More</button>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  <!-- {% for document in data %}
+  <div class="card-group">
+    <div class="card text-white m-3">
+      <div class="card-body">
+        <h5 class="card-title">{{document.Title}}</h5>
+        <p class="card-text">{{document.Content | truncatewords:30}}</p>
+        <button onclick="location.href='/summarypage?title={{ document.Title }}&content={{ document.Content }}'" class="btn-card">Read More</button>
+      </div>
+    </div>
+  </div>
+  {% endfor %} -->
+
+
+
+
 
 
 
