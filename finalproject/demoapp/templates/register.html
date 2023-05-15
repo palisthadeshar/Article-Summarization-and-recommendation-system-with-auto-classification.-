@@ -34,13 +34,13 @@
             <input type="password" placeholder="Repeat your password" name="password_repeat"/>
             <!-- <button>Register</button> -->
             <input type="submit"  value="Register" style="background-image: linear-gradient(45deg,black,	#36454F); color: white; cursor: pointer;"/>
-            {% if messages %}
+            <!-- {% if messages %}
             <ul class="messages">
               {% for message in messages %}
                 <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
               {% endfor %}
             </ul>
-          {% endif %}
+          {% endif %} -->
             <p class="message">Already registered? <a href="{% url 'login' %}">Login</a></p>
           </form>
           {% endblock %}

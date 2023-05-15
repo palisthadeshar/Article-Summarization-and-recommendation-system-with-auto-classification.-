@@ -15,7 +15,27 @@
 <body>
   {% include 'navbar.html' %}
 
-  {% for document in data %}
+  <div class="container">
+    <div class="row">
+      {% for item in data %}
+      <div class="col-md-4">
+        <div class="card text-white m-2">
+          <div class="card-body">
+            <h5 class="card-title">{{ item.Title | truncatewords:5 }}</h5>
+            <p class="card-text">{{ item.Content | truncatewords:30 }}</p>
+            <button onclick="window.location='/summarypage/{{ item.slug}}/'" class="btn-card">Read More</button>
+          </div>
+        </div>
+      </div>
+      {% if forloop.counter|divisibleby:3 %}
+    </div>
+    <div class="row">
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- {% for document in data %}
   <div class="card-group">
     <div class="card text-white m-3">
       <div class="card-body">
@@ -25,26 +45,10 @@
       </div>
     </div>
   </div>
-  {% endfor %}
-  <!-- {% for document in data %}
-  <div class="card-group">
-    <div class="card text-white m-3">
-      <div class="card-body">
-        <h5 class="card-title">{{document.Title}}</h5>
-        <p class="card-text">{{document.Content | truncatewords:30}}</p>
-        <button onclick="location.href='/summarypage?title={{ document.Title }}&content={{ document.Content }}'" class="btn-card">Read More</button>
-      </div>
-    </div>
-  </div>
   {% endfor %} -->
+  
+  
 
-
-
-
-
-
-
- 
       
 </body>
 </html>

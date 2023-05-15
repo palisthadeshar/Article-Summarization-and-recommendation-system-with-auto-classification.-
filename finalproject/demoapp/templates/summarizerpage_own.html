@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'summarizepage.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <title>summarize</title>
+</head>
+<body>
+  {% include 'navbar.html' %}
+      <div class="summarize-page" >
+      <div class="row" >
+        <!-- 1st section -->
+        <div class="col-sm-7">
+            <div class="form" class="col-md-6">
+                <div class="Summarize">
+                  <div class="header">
+                    <h3>{{summarypage.Title}}</h3>
+                  </div>
+                </div>
+                <form>
+                    <!-- <textarea >{{summarypage.Content}}</textarea> -->
+                    <textarea id="file-text"></textarea>
+                 
+                    <!-- {{ summarypage|pprint }}  -->
+                    <!-- upload and summary button -->
+                    <div class="button_container">
+                        <div class="row">
+                          <div class="col">
+                        <div class="part-1">
+                        <form action="/upload" method="post" enctype="multipart/form-data">
+                        
+                          <input type="file" id="file-upload" name="file-upload">
+                          <input type="button" value="Upload" onclick="getFileText()">
+                        </form>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="part-2">
+                        <button type="submit">Summarize</button>
+                      </div>
+                    </div>
+                      </div>
+                  </div>
+                
+                    <!-- <form action="/upload" method="post" enctype="multipart/form-data">
+                       <label for="file-upload">Choose a file to upload:</label> -->
+                      <!-- <input type="file" id="file-upload" name="file-upload">
+                      <input type="button" value="Upload" onclick="getFileText()">
+                      
+                     
+                    </form>
+
+                  <button type="submit">Summarize</button> --> 
+
+                  
+                </form>
+              </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form" class="col-md-6">
+            <div class="Summarize">
+              <div class="header">
+                <h3>Your summary</h3>
+                
+              </div>
+            </div>
+            <form>
+                <textarea></textarea>
+                <p>Labels:</p>
+                <input type="text"/>
+             
+             
+              
+            </form>
+          </div>
+            
+        </div>
+      </div>
+    </div>
+    <div class="row" >
+      
+      <div class="col-sm-12">
+        <h5 style="color:white; text-align: center;">Related Contents:</h5>
+          <div class="card-group m-3">
+                
+                <div class="card text-white ">
+                    
+                  <div class="card-body ">
+    
+                    <h5 class="card-title" style="color:
+                    black;">Card title</h5>
+                    <p class="card-text" style="color: black;">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                    <a href="#" class="btn-card">Read More</a>
+                  </div>
+          
+                </div>
+                
+                
+            </div>  
+            
+              
+          </div>  
+      </div>
+    </div>
+    <script>
+      function getFileText() {
+        var fileInput = document.getElementById("file-upload");
+        var file = fileInput.files[0];
+        var reader = new FileReader();
+        reader.onload = function() {
+          var fileText = reader.result;
+          document.getElementById("file-text").value = fileText;
+        };
+        reader.readAsText(file);
+      }
+      </script>
+</body>
+</html>

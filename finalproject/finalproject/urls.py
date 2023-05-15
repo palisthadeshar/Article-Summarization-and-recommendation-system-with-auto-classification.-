@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from demoapp import views
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.HomePage,name='home'),
@@ -24,6 +25,6 @@ urlpatterns = [
     path('login/',views.LoginPage,name='login'),
     path('home/',views.LogoutPage,name='logout'),
     path('summarypage/<slug:slug>/',views.Summary,name='summarypage'),
-    # path('summarypage/',views.Summary,name='summarypage'),
+    path('summarypageown/',views.SummarizeOwn,name='summarypageown'),
    
 ]

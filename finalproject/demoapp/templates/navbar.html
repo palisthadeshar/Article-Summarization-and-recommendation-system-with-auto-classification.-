@@ -5,6 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+  <!-- Default theme -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
     
     <title>Summarizer</title>
     {% load static %}
@@ -31,7 +35,7 @@
         
         <div class="nav-links">
           <a href="{% url 'home' %}" >Home</a>
-          <a href="#">Summarizer</a>
+          <a href="{% url 'summarypageown' %}">Summarizer</a>
           {% if user.is_authenticated %}
           <a href="{% url 'home' %}">Hi, {{ user.username }}</a>
           <a href="{% url 'logout' %}">Logout</a>
@@ -42,8 +46,14 @@
           
         </div>
       </div>
-
-    
+<!-- js link for altertify -->
+      <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+      <script>
+        {% for msg in messages %}
+         alertify.set('notifier','position', 'top-center');
+         alertify.success('{{msg}}');
+         {% endfor %}
+      </script>
       
 </body>
 </html>

@@ -70,6 +70,33 @@ margin-bottom: 26px;
   transition: all 0.3 ease;
   cursor: pointer;
 }
+input[type="button"]{
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  text-align: center;
+  outline: 0;
+  background-color: black;
+  background-image: linear-gradient(45deg,black,	#36454F);
+  width: 50%;
+  border: 0;
+  padding: 12px 24px;
+  color: #FFFFFF;
+  font-size: 14px;
+  -webkit-transition: all 0.3 ease;
+  transition: all 0.3 ease;
+  cursor: pointer;
+}
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+.button-container .part-1 {
+  flex: 2;
+}
+
+.button-container .part-2 {
+  flex: 1;
+}
 .form .message {
   margin: 15px 0 0;
   color: #b3b3b3;
