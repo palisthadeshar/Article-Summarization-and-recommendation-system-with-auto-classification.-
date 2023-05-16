@@ -21,7 +21,7 @@
         <input type="checkbox" id="nav-check">
         <div class="nav-header">
           <div class="nav-title">
-            logo
+           <a href="{% url 'home' %}" style="color:white; text-decoration: none;"> <b>ArticleExplorer</b></a>
           </div>
         </div>
         <div class="nav-btn">
@@ -50,8 +50,10 @@
       <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
       <script>
         {% for msg in messages %}
-         alertify.set('notifier','position', 'top-center');
-         alertify.success('{{msg}}');
+          alertify.set('notifier','position', 'top-center');
+
+          alertify.success('{{msg}}');
+          // alertify.error('{{msg}}');
          {% endfor %}
       </script>
       

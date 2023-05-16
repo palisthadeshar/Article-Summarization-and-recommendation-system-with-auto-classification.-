@@ -16,6 +16,7 @@ from django.db import DatabaseError
 
 
 # Create your views here.
+#home page
 def HomePage(request):
     client = pymongo.MongoClient("mongodb://localhost:27017/")
     db = client["database"]
@@ -25,6 +26,8 @@ def HomePage(request):
     #     print(document)
     return render (request,'home.html',{ "data": data })
 
+
+#summarize the exisiting content
 def Summary(request,slug):
     try:
         client = MongoClient('mongodb://localhost:27017/')
@@ -45,10 +48,20 @@ def Summary(request,slug):
         return render(request, '404.html')
 
 
+
+#to summarize own article
 def SummarizeOwn(request):
-    return render(request, 'summarizerpage_own.html')
-   
-# validations not done properly. already entered data throws databse error. need to fix!!!!!!
+    if not request.user.is_authenticated:
+        return redirect('login')
+        
+        
+    else:
+        return render(request, 'summarizerpage_own.html')
+
+
+#registration page
+# database error solved!!! error msg is not displaying . Need to be resolved!!!!!!!
+#email confirmation is yet to be done!!!
 def SignupPage(request):
       
     if request.method == 'POST':
@@ -57,41 +70,87 @@ def SignupPage(request):
         password = request.POST['password']
         password_repeat = request.POST['password_repeat']
        
-        msg=""
-        # print(User)
-        try:
-            
-            if password == password_repeat:
-                try:
-                    if User.objects.filter(username=name).exists():
-                        
-                       
-                        msg=messages.info(request,'User name already taken')
-                        # raise ValueError('User exists.')
-                        return redirect('signup')
-                    elif User.objects.filter(email=email).exists():
-                        msg=messages.info(request,'Email already taken')
-                        return redirect('signup')
-                        
-                    else:
-                        user = User.objects.create_user(username=name, email=email,password=password)
-                        user.save()
-                        msg=messages.info(request,'User Created sucessfully.')
-                        return redirect('login')
-                except DatabaseError:
-                    messages.info(request, msg)
-            else:
-                msg=messages.info(request,'Password doesnot.')
-                # raise ValueError('Password does not match.')
-                
-        except ValueError as e:
-            messages.info(request, str(e))
+
+        if (name == ' ' or email == ' ' or password == ' ' or password_repeat == ''):
+            messages.info(request,'Input fields cannot be empty')
             return redirect('signup')
+        else:
+          
+                    # if any field is not null goes here
+                  
+                    if password == password_repeat:  
+                        try:
+
+                            if User.objects.filter(username=name).exists(): 
+                                messages.info(request,'User name exists.')
+                                raise DatabaseError('Username already exists')   
+                                # return redirect('signup')
+                            
+                            elif User.objects.filter(email=email).exists():
+                                raise DatabaseError('Email already exists')
+                                # return redirect('signup')
+                                    
+                            else:
+                                user = User.objects.create_user(username=name, email=email,password=password)
+                                user.save()
+                                messages.info(request,'User Created sucessfully.')
+                                return redirect('login')
+                        except DatabaseError as msg:
+                            messages.info(request,msg)
+                            return redirect('signup')
+                    else:
+                                
+                        messages.info(request,'Password doesnot matches.')
+                        return redirect('signup')
+            
+
+            
     else:
         return render(request,'register.html')
         
+        # print(User)
+    #     try:
+            
+    #         if password == password_repeat:
+    #             msg=""
+    #             try:
+    #                 # if any field is not null goes here
+    #                 if (name == ' ' or email == ' ' or password == ' ' or password_repeat == ''):
+                        
+    #                     if User.objects.filter(username=name).exists():
+    #                         messages.info(request,'User name already taken')
+                            
+    #                         return redirect('signup')
+    #                     elif User.objects.filter(email=email).exists():
+    #                         messages.info(request,'Email already taken')
+    #                         return redirect('signup')
+                            
+    #                     else:
+    #                         user = User.objects.create_user(username=name, email=email,password=password)
+    #                         user.save()
+    #                         messages.info(request,'User Created sucessfully.')
+    #                         return redirect('login')
+    #                 else:
+    #                      print('i am here')
+    #                      messages.info(request,'Input fields cannot be empty.')
+    #                      return redirect('signup')
+    #             except DatabaseError as msg:
+    #                 messages.info(request, msg)
+    #                 return redirect('signup')
+    #         else:
+                
+    #             messages.info(request,'Password doesnot.')
+    #             return redirect('signup')
+                
+    #     except ValueError:
+    #         messages.info(request, 'Something went wrong. Please register again.')
+    #         return redirect('signup')
+    # else:
+    #     return render(request,'register.html')
+        
 
-    
+
+#login page
 def LoginPage(request):
     
     if request.method == 'POST':
@@ -113,7 +172,7 @@ def LoginPage(request):
     return render (request,'login.html')
 
 
-
+#logout
 def LogoutPage(request):
     logout(request)
     return redirect('home')
