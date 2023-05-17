@@ -26,5 +26,6 @@ urlpatterns = [
     path('home/',views.LogoutPage,name='logout'),
     path('summarypage/<slug:slug>/',views.Summary,name='summarypage'),
     path('summarypageown/',views.SummarizeOwn,name='summarypageown'),
+    path('summary/',views.get_summary,name='summary'),
    
 ]

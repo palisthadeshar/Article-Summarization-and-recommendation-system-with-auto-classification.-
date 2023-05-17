@@ -12,6 +12,20 @@ from django.shortcuts import render, get_object_or_404
 from bson import ObjectId
 from django.http import Http404
 from django.db import DatabaseError
+import json
+import pickle
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_protect
+import nltk
+import string
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+import sklearn
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import TruncatedSVD
+from sklearn.preprocessing import Normalizer
+import numpy as np
 
 
 
@@ -29,6 +43,7 @@ def HomePage(request):
 
 #summarize the exisiting content
 def Summary(request,slug):
+    
     try:
         client = MongoClient('mongodb://localhost:27017/')
         db = client['database']
@@ -40,10 +55,9 @@ def Summary(request,slug):
             
             # summarypage = get_object_or_404(collection, {'slug': slug})
             context = {'summarypage': summarypage}
-            return render(request, 'summarizerpage.html', context)
-        
-            
            
+            return render(request, 'summarizerpage.html', context)
+                    
     except Exception as e:
         return render(request, '404.html')
 
@@ -178,8 +192,54 @@ def LogoutPage(request):
     return redirect('home')
 
 
-
-
-
-
+#summarize using ml model
+def text_preprocess(article):
+    #tokenizing the text into words
+    tokens = word_tokenize(article)
     
+    #stop words and puntuations removal 
+    stop_words = set(stopwords.words('english')+list(string.punctuation))
+    #filter all the tokens not in stop words and convert into lower case
+    filtered_tokens = [token.lower() for token in tokens if token.lower() not in stop_words]
+    
+    #lemmatize the filtered token
+    lemmatizer = WordNetLemmatizer()
+    lemmatized_tokens = [lemmatizer.lemmatize(words) for words in filtered_tokens]
+    
+    #join the lemmatized tokens back into string
+    text_preprocessed = ' '.join(lemmatized_tokens)
+    
+    return text_preprocessed
+
+def summarize(article, n):
+    # article=text_preprocess(article)
+   #tfidfvectorizer obj: converting text data into matrix of word freq.
+    vectorizer = TfidfVectorizer(stop_words='english')
+    converted_metrics = vectorizer.fit_transform([article]) #fit the vectorizer to the text
+    
+    #aapplying svd to the matrix of word to extract hidden semantic structure.
+    svd = TruncatedSVD(n_components=20)
+    #term document matrix
+    term_svd = svd.fit_transform(converted_metrics) 
+    
+    # Get most important sentences
+    scores = np.sum(term_svd**2, axis=1)
+    #sort ssentence according to thier score
+    sentence_order = np.argsort(scores)[::-1]
+    sentences = article.split('\n')
+    # summary = '. '.join([sentences[i] for i in sentence_order[:n]])
+    summary = '. '.join([sentences[i] + '.' for i in sentence_order[:n]])
+
+    return summary
+
+@csrf_protect
+def get_summary(request):
+    if request.method == 'POST':
+        text = request.POST.get('text')
+        preprocess = text_preprocess(text)
+        prediction = summarize(preprocess,4)
+        print(preprocess)
+        # print(prediction)
+        context = {'text': text,'prediction':prediction}
+        
+    return render(request, 'summarizerpage.html',context)

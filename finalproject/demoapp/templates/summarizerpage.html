@@ -15,23 +15,32 @@
       <div class="summarize-page" >
       <div class="row" >
         <!-- 1st section -->
-        <div class="col-sm-7">
+        <div class="col-sm-6">
             <div class="form" class="col-md-6">
                 <div class="Summarize">
                   <div class="header">
                     <h3>{{summarypage.Title}}</h3>
                   </div>
                 </div>
-                <form>
-                    <textarea>{{summarypage.Content}}</textarea>
-                 
-                    <!-- {{ summarypage|pprint }}  -->
-                  <button type="submit">Summarize</button>
-                  
+                <!-- correct one -->
+                <form  method="post" action="{% url 'summary' %}" >
+                  {% csrf_token %}
+                    <textarea id="myTextarea" name="text">{{summarypage.Content}} {{text}}</textarea>
+                    
+                  <button type="submit" onclick="sendText()">Summarize</button>
                 </form>
+
+                <!-- trying -->
+                <!-- <form method="POST" action="{% url 'summary' %}">
+                  {% csrf_token %}
+                  <textarea id="myTextarea" name="text">{{summarypage.Content}}</textarea>
+                    
+                  <button type="submit" onclick="sendText()">Summarize</button>
+              </form> -->
+              <!-- upto here -->
               </div>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-6">
           <div class="form" class="col-md-6">
             <div class="Summarize">
               <div class="header">
@@ -39,8 +48,8 @@
                 
               </div>
             </div>
-            <form>
-                <textarea></textarea>
+            <form method="POST">
+                <textarea>{{prediction}}</textarea>
                 <p>Labels:</p>
                 <input type="text"/>
              
@@ -77,5 +86,14 @@
           </div>  
       </div>
     </div>
+    <script>
+      function sendText() {
+          var text = document.getElementById("myTextarea").value;
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "{% url 'summary' %}");
+          xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+          xhr.send("text=" + text);
+      }
+  </script>
 </body>
 </html>
