@@ -8,7 +8,6 @@ from django.contrib.auth import logout
 from django.contrib.auth.models import User, auth
 import pymongo
 from django.shortcuts import render, get_object_or_404
-# from .models import Article
 from bson import ObjectId
 from django.http import Http404
 from django.db import DatabaseError
@@ -52,25 +51,11 @@ def Summary(request,slug):
         if slug is not None:
             # print(slug)
             summarypage = collection.find_one({'slug': slug})
-            
             # summarypage = get_object_or_404(collection, {'slug': slug})
             context = {'summarypage': summarypage}
-           
-            return render(request, 'summarizerpage.html', context)
-                    
+            return render(request, 'summarizerpage.html', context)            
     except Exception as e:
         return render(request, '404.html')
-
-
-
-#to summarize own article
-def SummarizeOwn(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-        
-        
-    else:
-        return render(request, 'summarizerpage_own.html')
 
 
 #registration page
@@ -122,46 +107,6 @@ def SignupPage(request):
     else:
         return render(request,'register.html')
         
-        # print(User)
-    #     try:
-            
-    #         if password == password_repeat:
-    #             msg=""
-    #             try:
-    #                 # if any field is not null goes here
-    #                 if (name == ' ' or email == ' ' or password == ' ' or password_repeat == ''):
-                        
-    #                     if User.objects.filter(username=name).exists():
-    #                         messages.info(request,'User name already taken')
-                            
-    #                         return redirect('signup')
-    #                     elif User.objects.filter(email=email).exists():
-    #                         messages.info(request,'Email already taken')
-    #                         return redirect('signup')
-                            
-    #                     else:
-    #                         user = User.objects.create_user(username=name, email=email,password=password)
-    #                         user.save()
-    #                         messages.info(request,'User Created sucessfully.')
-    #                         return redirect('login')
-    #                 else:
-    #                      print('i am here')
-    #                      messages.info(request,'Input fields cannot be empty.')
-    #                      return redirect('signup')
-    #             except DatabaseError as msg:
-    #                 messages.info(request, msg)
-    #                 return redirect('signup')
-    #         else:
-                
-    #             messages.info(request,'Password doesnot.')
-    #             return redirect('signup')
-                
-    #     except ValueError:
-    #         messages.info(request, 'Something went wrong. Please register again.')
-    #         return redirect('signup')
-    # else:
-    #     return render(request,'register.html')
-        
 
 
 #login page
@@ -185,50 +130,30 @@ def LoginPage(request):
     # form = AuthenticationForm()
     return render (request,'login.html')
 
-
-#logout
-def LogoutPage(request):
-    logout(request)
-    return redirect('home')
-
-
 #summarize using ml model
 def text_preprocess(article):
     #tokenizing the text into words
     tokens = word_tokenize(article)
-    
-    #stop words and puntuations removal 
-    stop_words = set(stopwords.words('english')+list(string.punctuation))
-    #filter all the tokens not in stop words and convert into lower case
-    filtered_tokens = [token.lower() for token in tokens if token.lower() not in stop_words]
-    
-    #lemmatize the filtered token
     lemmatizer = WordNetLemmatizer()
-    lemmatized_tokens = [lemmatizer.lemmatize(words) for words in filtered_tokens]
-    
+    lemmatized_tokens = [lemmatizer.lemmatize(words) for words in tokens]
     #join the lemmatized tokens back into string
     text_preprocessed = ' '.join(lemmatized_tokens)
-    
     return text_preprocessed
 
 def summarize(article, n):
-    # article=text_preprocess(article)
-   #tfidfvectorizer obj: converting text data into matrix of word freq.
+    # Convert article to a list of sentences
+    sentences = article.split('. ')
+    # Create a tfidf vectorizer
     vectorizer = TfidfVectorizer(stop_words='english')
-    converted_metrics = vectorizer.fit_transform([article]) #fit the vectorizer to the text
-    
-    #aapplying svd to the matrix of word to extract hidden semantic structure.
+    # Fit the vectorizer to the sentences
+    X = vectorizer.fit_transform(sentences)
+    # Apply LSA to the tfidf matrix
     svd = TruncatedSVD(n_components=20)
-    #term document matrix
-    term_svd = svd.fit_transform(converted_metrics) 
-    
-    # Get most important sentences
-    scores = np.sum(term_svd**2, axis=1)
-    #sort ssentence according to thier score
+    X_lsa = svd.fit_transform(X)
+    # Get the most important sentences
+    scores = np.sum(X_lsa**2, axis=1)
     sentence_order = np.argsort(scores)[::-1]
-    sentences = article.split('\n')
-    # summary = '. '.join([sentences[i] for i in sentence_order[:n]])
-    summary = '. '.join([sentences[i] + '.' for i in sentence_order[:n]])
+    summary = '. '.join([sentences[i] for i in sentence_order[:n]])
 
     return summary
 
@@ -237,9 +162,32 @@ def get_summary(request):
     if request.method == 'POST':
         text = request.POST.get('text')
         preprocess = text_preprocess(text)
-        prediction = summarize(preprocess,4)
-        print(preprocess)
+        prediction = summarize(preprocess,5)
+        # print(preprocess)
         # print(prediction)
         context = {'text': text,'prediction':prediction}
         
     return render(request, 'summarizerpage.html',context)
+
+
+
+#to summarize own article
+@csrf_protect
+def SummarizeOwn(request):
+    if not request.user.is_authenticated:
+        return redirect('login')    
+    else:
+        if request.method == 'POST':
+            text = request.POST.get('file_text')
+            preprocess = text_preprocess(text)
+            prediction = summarize(preprocess,5)
+            # print(preprocess)
+            # print(prediction)
+            context = {'text': text,'prediction':prediction}
+            return render(request, 'summarizerpage_own.html',context)
+    return render(request, 'summarizerpage_own.html')
+
+#logout
+def LogoutPage(request):
+    logout(request)
+    return redirect('home')

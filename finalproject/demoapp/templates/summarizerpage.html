@@ -17,17 +17,18 @@
         <!-- 1st section -->
         <div class="col-sm-6">
             <div class="form" class="col-md-6">
-                <div class="Summarize">
-                  <div class="header">
-                    <h3>{{summarypage.Title}}</h3>
-                  </div>
-                </div>
+             
                 <!-- correct one -->
-                <form  method="post" action="{% url 'summary' %}" >
+                <form  method="post" action="{% url 'summary' %}">
                   {% csrf_token %}
+                  <div class="Summarize">
+                    <div class="header">
+                      <h3 id="myHeading" name="heading">{{summarypage.Title}}</h3>
+                    </div>
+                  </div>
                     <textarea id="myTextarea" name="text">{{summarypage.Content}} {{text}}</textarea>
                     
-                  <button type="submit" onclick="sendText()">Summarize</button>
+                  <button type="submit" onclick="sendText()" >Summarize</button>
                 </form>
 
                 <!-- trying -->
@@ -42,13 +43,15 @@
         </div>
         <div class="col-sm-6">
           <div class="form" class="col-md-6">
-            <div class="Summarize">
-              <div class="header">
-                <h3>Your summary</h3>
-                
-              </div>
-            </div>
+      
             <form method="POST">
+              {% csrf_token %}
+              <div class="Summarize">
+                <div class="header">
+                  <h3>Your summary </h3>
+                  
+                </div>
+              </div>
                 <textarea>{{prediction}}</textarea>
                 <p>Labels:</p>
                 <input type="text"/>
@@ -88,12 +91,18 @@
     </div>
     <script>
       function sendText() {
-          var text = document.getElementById("myTextarea").value;
-          var xhr = new XMLHttpRequest();
-          xhr.open("POST", "{% url 'summary' %}");
-          xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-          xhr.send("text=" + text);
+        var text = document.getElementById("myTextarea").value;
+
+        // Send the text to the views.py page using AJAX
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "{% url 'summary' %}");
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send("text=" + text);
       }
+
+
+
+
   </script>
 </body>
 </html>

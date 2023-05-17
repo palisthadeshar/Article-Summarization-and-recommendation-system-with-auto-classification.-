@@ -22,9 +22,10 @@
                     <h3>{{summarypage.Title}}</h3>
                   </div>
                 </div>
-                <form>
+                <form method="POST">
+                  {% csrf_token %}
                     <!-- <textarea >{{summarypage.Content}}</textarea> -->
-                    <textarea id="file-text"></textarea>
+                    <textarea id="file-text" name="file_text">{{text}}</textarea>
                  
                     <!-- {{ summarypage|pprint }}  -->
                     <!-- upload and summary button -->
@@ -41,23 +42,11 @@
                       </div>
                       <div class="col">
                         <div class="part-2">
-                        <button type="submit">Summarize</button>
+                        <button type="submit" onClick="sendText()">Summarize</button>
                       </div>
                     </div>
                       </div>
                   </div>
-                
-                    <!-- <form action="/upload" method="post" enctype="multipart/form-data">
-                       <label for="file-upload">Choose a file to upload:</label> -->
-                      <!-- <input type="file" id="file-upload" name="file-upload">
-                      <input type="button" value="Upload" onclick="getFileText()">
-                      
-                     
-                    </form>
-
-                  <button type="submit">Summarize</button> --> 
-
-                  
                 </form>
               </div>
         </div>
@@ -70,7 +59,8 @@
               </div>
             </div>
             <form>
-                <textarea></textarea>
+              {% csrf_token %}
+                <textarea>{{prediction}}</textarea>
                 <p>Labels:</p>
                 <input type="text"/>
              
@@ -117,6 +107,16 @@
           document.getElementById("file-text").value = fileText;
         };
         reader.readAsText(file);
+      }
+
+      function sendText() {
+        var file_text = document.getElementById("file-text").value;
+
+        // Send the text to the views.py page using AJAX
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "{% url 'summarypageown' %}");
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send("file_text=" + file_text);
       }
       </script>
 </body>

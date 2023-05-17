@@ -24,8 +24,11 @@ urlpatterns = [
     path('signup/',views.SignupPage, name='signup'),
     path('login/',views.LoginPage,name='login'),
     path('home/',views.LogoutPage,name='logout'),
+    #displays the content ffrom home page
     path('summarypage/<slug:slug>/',views.Summary,name='summarypage'),
-    path('summarypageown/',views.SummarizeOwn,name='summarypageown'),
+    #summarizes uploaded 
+    path('summarypageown/',views.SummarizeOwn,name='summarypageown'), 
+    #summarizes existing
     path('summary/',views.get_summary,name='summary'),
    
 ]
