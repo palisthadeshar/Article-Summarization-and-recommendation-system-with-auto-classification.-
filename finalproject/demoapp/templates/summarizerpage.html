@@ -24,11 +24,12 @@
                   <div class="Summarize">
                     <div class="header">
                       <h3 id="myHeading" name="heading">{{summarypage.Title}}</h3>
+                      <textarea id="id" name="id" style="visibility: hidden; height: 0;">{{id}}</textarea>
                     </div>
                   </div>
                     <textarea id="myTextarea" name="text">{{summarypage.Content}} {{text}}</textarea>
                     
-                  <button type="submit" onclick="sendText()" >Summarize</button>
+                  <button id="my-button" type="submit" onclick="sendText()" >Summarize</button>
                 </form>
 
                 <!-- trying -->
@@ -48,7 +49,7 @@
               {% csrf_token %}
               <div class="Summarize">
                 <div class="header">
-                  <h3>Your summary </h3>
+                  <h4>Your summary for </h4>
                   
                 </div>
               </div>
@@ -64,43 +65,43 @@
         </div>
       </div>
     </div>
-    <div class="row" >
-      
-      <div class="col-sm-12">
-        <h5 style="color:white; text-align: center;">Related Contents:</h5>
-          <div class="card-group m-3">
-                
-                <div class="card text-white ">
-                    
-                  <div class="card-body ">
-    
-                    <h5 class="card-title" style="color:
-                    black;">Card title</h5>
-                    <p class="card-text" style="color: black;">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                    <a href="#" class="btn-card">Read More</a>
-                  </div>
-          
-                </div>
-                
-                
-            </div>  
-            
-              
-          </div>  
+    <div class="container">
+      <h2 style="color:white"><i>Recommendations</i></h2>
+      <div class="row">
+        {% csrf_token %}
+        {% for item in recommendation %}
+        <div class="col-md-4">
+          <div class="card  m-2">
+            <div class="card-body">
+              <h5 class="card-title">{{ item.Title | truncatewords:5 }}</h5>
+              <p class="card-text">{{ item.Content | truncatewords:10 }}</p>
+              <button>Read More</button>
+            </div>
+          </div>
+        </div>
+        {% if forloop.counter|divisibleby:3 %}
       </div>
+      <div class="row">
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  
+  
     </div>
     <script>
       function sendText() {
         var text = document.getElementById("myTextarea").value;
-
+        var id = document.getElementById("id").value;
+        const headingText = document.getElementById("myHeading").textContent;
         // Send the text to the views.py page using AJAX
         var xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.open("POST", "{% url 'summary' %}");
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.send("text=" + text);
+        xhr.send("text=" + text,"id="+id);
+       
       }
-
-
 
 
   </script>

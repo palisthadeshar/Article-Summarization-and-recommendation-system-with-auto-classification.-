@@ -12,6 +12,7 @@ from bson import ObjectId
 from django.http import Http404
 from django.db import DatabaseError
 import json
+from django.http import JsonResponse
 import pickle
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect
@@ -25,6 +26,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.preprocessing import Normalizer
 import numpy as np
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 
@@ -35,24 +38,33 @@ def HomePage(request):
     db = client["database"]
     collection = db["ARTICLE"]
     data = collection.find()
-    # for document in data:
-    #     print(document)
+   
+
     return render (request,'home.html',{ "data": data })
+
+
+def sim_score(preprocessed_text):
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform(preprocessed_text)
+    similarity_score = cosine_similarity(tfidf_matrix)
+    return similarity_score
 
 
 #summarize the exisiting content
 def Summary(request,slug):
-    
     try:
         client = MongoClient('mongodb://localhost:27017/')
         db = client['database']
         collection = db['ARTICLE']
-        
+        # articles = list(collection.find())
         if slug is not None:
             # print(slug)
             summarypage = collection.find_one({'slug': slug})
+            object_id = str(summarypage['_id'])
+            content=summarypage['Content']
+      
             # summarypage = get_object_or_404(collection, {'slug': slug})
-            context = {'summarypage': summarypage}
+            context = {'summarypage': summarypage,'id':object_id}
             return render(request, 'summarizerpage.html', context)            
     except Exception as e:
         return render(request, '404.html')
@@ -143,29 +155,49 @@ def text_preprocess(article):
 def summarize(article, n):
     # Convert article to a list of sentences
     sentences = article.split('. ')
-    # Create a tfidf vectorizer
     vectorizer = TfidfVectorizer(stop_words='english')
-    # Fit the vectorizer to the sentences
     X = vectorizer.fit_transform(sentences)
-    # Apply LSA to the tfidf matrix
     svd = TruncatedSVD(n_components=20)
     X_lsa = svd.fit_transform(X)
     # Get the most important sentences
     scores = np.sum(X_lsa**2, axis=1)
     sentence_order = np.argsort(scores)[::-1]
+    # sentence_order = np.argsort(scores)
+    # reverse_order = np.flipud(sentence_order)
     summary = '. '.join([sentences[i] for i in sentence_order[:n]])
 
     return summary
 
+
+
+
 @csrf_protect
 def get_summary(request):
+    client = MongoClient('mongodb://localhost:27017/')
+    db = client['database']
+    collection = db['ARTICLE']
+    articles = list(collection.find())
+    contents = [article['Content'] for article in articles]
+    ids = [str(article['_id']) for article in articles]
     if request.method == 'POST':
         text = request.POST.get('text')
+        id = request.POST.get('id')  
         preprocess = text_preprocess(text)
         prediction = summarize(preprocess,5)
-        # print(preprocess)
-        # print(prediction)
-        context = {'text': text,'prediction':prediction}
+        similarity_score=sim_score(contents)
+        # print(similarity_score)
+        index = ids.index(id)
+        scores = list(enumerate(similarity_score[index]))
+        scores_sorted = sorted(scores, key=lambda x: x[1], reverse=True)
+        num_recommendations=5
+        recommended_ids = [ids[score[0]] for score in scores_sorted[1:num_recommendations+1]]
+        recommended_articles = []
+        for recommended_id in recommended_ids:
+            recommended_article = collection.find_one({'_id': ObjectId(recommended_id)})
+            recommended_articles.append(recommended_article)
+
+        context = {'text': text,'prediction':prediction,'recommendation':recommended_articles}
+      
         
     return render(request, 'summarizerpage.html',context)
 
@@ -180,7 +212,8 @@ def SummarizeOwn(request):
         if request.method == 'POST':
             text = request.POST.get('file_text')
             preprocess = text_preprocess(text)
-            prediction = summarize(preprocess,5)
+            prediction = summarize(preprocess,10)
+            
             # print(preprocess)
             # print(prediction)
             context = {'text': text,'prediction':prediction}
