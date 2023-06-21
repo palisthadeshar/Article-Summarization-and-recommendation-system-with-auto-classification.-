@@ -1,4 +1,17 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto:300);
+@import url("https://fonts.googleapis.com/css?family=Mukta:400,500&display=swap");
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+body {
+    min-height: 100vh;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><g fill="none" stroke-width="1" stroke="hsl(210, 90%, 30%)"><path d="M 0 30 Q 40 60 20 100"></path><path d="M 20 0 Q 40 60 100 30"></path></g></svg>'),
+        hsl(210, 90%, 45%);
+    background-size: 50px;
+    font-family: "Mukta", sans-serif;
+}
 header .header{
   background-color: #fff;
   height: 45px;
@@ -37,20 +50,25 @@ margin-bottom: 26px;
   box-sizing: border-box;
   font-size: 14px;
 }
-.form button {
+.form input[type=submit] {
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
   outline: 0;
-  background-color: black;
-  background-image: linear-gradient(45deg,black,	#36454F);
+  background-image: linear-gradient(147deg, #0066b2 0%, #6699CC 74%);
+
   width: 100%;
+  border-radius: 50px;
   border: 0;
   padding: 15px;
   color: #FFFFFF;
   font-size: 14px;
   -webkit-transition: all 0.3 ease;
+  transition: transform 0.3s ease-in-out;
   transition: all 0.3 ease;
   cursor: pointer;
+}
+.form input[type=submit]:hover{
+  transform: translateX(10px);
 }
 .form .message {
   margin: 15px 0 0;
@@ -69,10 +87,3 @@ margin-bottom: 26px;
   margin: 0 auto;
 }
 
-body {
-  background-color: black;
-  background-image: linear-gradient(45deg,black,	#36454F);
-  font-family: "Roboto", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}

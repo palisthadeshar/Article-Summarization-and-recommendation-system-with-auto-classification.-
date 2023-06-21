@@ -1,18 +1,24 @@
+@import url("https://fonts.googleapis.com/css?family=Mukta:400,500&display=swap");
+
 * {
     box-sizing: border-box;
-  }
-  
-  body {
-    margin: 0px;
-    font-family: 'segoe ui';
-  }
+    padding: 0;
+    margin: 0;
+}
+body {
+    min-height: 100vh;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><g fill="none" stroke-width="1" stroke="hsl(210, 90%, 30%)"><path d="M 0 30 Q 40 60 20 100"></path><path d="M 20 0 Q 40 60 100 30"></path></g></svg>'),
+        hsl(210, 90%, 45%);
+    background-size: 50px;
+    font-family: "Mukta", sans-serif;
+}
   
   .nav {
     display: block !important;
     /* position: sticky; */
     height: 60px;
     width: 100%;
-    background-color: black;
+    /* background-color: #318CE7; */
     position: relative;
   }
   
@@ -42,6 +48,7 @@
     padding: 13px 10px 13px 10px;
     text-decoration: none;
     color: #efefef;
+    font-size:larger;
   }
   
   .nav > .nav-links > a:hover {

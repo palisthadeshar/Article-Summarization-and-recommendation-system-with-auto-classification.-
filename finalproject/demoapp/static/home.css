@@ -1,3 +1,28 @@
+/* @import url('https://fonts.googleapis.com/css?family=Fira+Sans:400,500,600,700,800');
+* {
+  box-sizing: border-box;
+}
+body {
+background-color: #89CFF0;
+background-image: linear-gradient(147deg, #0066b2 0%, #6699CC 74%);
+min-height: 100vh;
+font-family: 'Fira Sans', sans-serif;
+
+} */
+@import url("https://fonts.googleapis.com/css?family=Mukta:400,500&display=swap");
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+body {
+    min-height: 100vh;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><g fill="none" stroke-width="1" stroke="hsl(210, 90%, 30%)"><path d="M 0 30 Q 40 60 20 100"></path><path d="M 20 0 Q 40 60 100 30"></path></g></svg>'),
+        hsl(210, 90%, 45%);
+    background-size: 50px;
+    font-family: "Mukta", sans-serif;
+}
 .card-group {
   display: flex;
   justify-content: space-between;
@@ -9,11 +34,15 @@
   .card {
     border: none;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    background-image: linear-gradient(45deg,black,	#36454F);
-    color:white;
+    background-image: linear-gradient(45deg,	#F0F8FF);
+    color:black;
+    border-radius: 20px;
+    opacity: 90%;
   }
   
-  
+.jumbotron{
+  background-color: none !important;
+}
   .card-img-top {
     max-height: 250px;
     object-fit: cover;
@@ -31,9 +60,19 @@
   }
   
   .btn-card {
-    background-color: white;
-    border-radius: 10px;
-    padding: 10px;
+    background-image: linear-gradient(147deg, #0066b2,	#F0F8FF);
+    padding: 15px 25px;
+    border-radius: 50px;
+    color: #00308F;
+    
+    /* box-shadow: 0px 14px 80px rgba(252, 56, 56, 0.4); */
+    text-decoration: none;
+    font-weight: 500;
+    justify-content: center;
+    text-align: center;
+    letter-spacing: 1px;
+    border:none;
+    transition: transform 0.3s ease-in-out;
  
   }
   .card-body a{
@@ -43,7 +82,7 @@
   
   .btn-card:hover {
     background-color: #0069d9;
-    color: white;
     text-decoration: none;
+    transform: translateX(10px);
   }
   
