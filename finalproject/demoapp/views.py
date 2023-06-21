@@ -18,6 +18,15 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect
 import nltk
 import string
+from num2words import num2words
+import re
+from django.core.mail import send_mail
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.urls import reverse_lazy
+from django.utils.encoding import force_bytes
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
@@ -28,6 +37,9 @@ from sklearn.preprocessing import Normalizer
 import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
+import tensorflow as tf
+from keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 
 
@@ -61,15 +73,34 @@ def Summary(request,slug):
             # print(slug)
             summarypage = collection.find_one({'slug': slug})
             object_id = str(summarypage['_id'])
-            content=summarypage['Content']
-      
             # summarypage = get_object_or_404(collection, {'slug': slug})
             context = {'summarypage': summarypage,'id':object_id}
             return render(request, 'summarizerpage.html', context)            
     except Exception as e:
         return render(request, '404.html')
+    
+
+# def activateEmail(request,user,to_email):
+#     mail_subject = 'Activate your account.'
+#     message = render_to_string('activate_account.html', {
+#                                     'user': user,
+#                                     'domain': get_current_site(request).domain,
+#                                     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+#                                     'token': account_activation_token.make_token(user),
+#                                     'protocol':'https' if request.is_secure() else 'http'
+#                                 })
+#     email = EmailMessage(
+#                         mail_subject, message, to=[to_email]
+#             )
+#     if email.send():
+
+#         messages.success(request,f'Dear {user}, please go to your {to_email} inbox and activate your account.')
+#     else:
+#         messages.success(request,f'Problem sending email {to_email}, check your email if is it correct.')
 
 
+# def activate(request,uidb64,token):
+#     return redirect('home')
 #registration page
 # database error solved!!! error msg is not displaying . Need to be resolved!!!!!!!
 #email confirmation is yet to be done!!!
@@ -98,12 +129,19 @@ def SignupPage(request):
                                 # return redirect('signup')
                             
                             elif User.objects.filter(email=email).exists():
+                                messages.info(request,'Email exists.')
                                 raise DatabaseError('Email already exists')
                                 # return redirect('signup')
                                     
                             else:
                                 user = User.objects.create_user(username=name, email=email,password=password)
+                                # user.is_active=False
+                                
                                 user.save()
+                              
+                                
+                                # activateEmail(request,user,email)
+                         
                                 messages.info(request,'User Created sucessfully.')
                                 return redirect('login')
                         except DatabaseError as msg:
@@ -132,7 +170,6 @@ def LoginPage(request):
         if user is not None :
             
             # print(authenticated_user)
-           
             auth.login(request, user)
             messages.success(request,f'welcome {name}!')
             return redirect('home')
@@ -144,30 +181,36 @@ def LoginPage(request):
 
 #summarize using ml model
 def text_preprocess(article):
-    #tokenizing the text into words
+    article = article.replace('—', ' ')
     tokens = word_tokenize(article)
-    lemmatizer = WordNetLemmatizer()
-    lemmatized_tokens = [lemmatizer.lemmatize(words) for words in tokens]
-    #join the lemmatized tokens back into string
-    text_preprocessed = ' '.join(lemmatized_tokens)
+    # for i in range(len(tokens)):
+    #     if tokens[i].isdigit():
+    #         tokens[i] = num2words(tokens[i])
+    text_preprocessed = ' '.join(tokens)
     return text_preprocessed
 
 def summarize(article, n):
-    # Convert article to a list of sentences
     sentences = article.split('. ')
     vectorizer = TfidfVectorizer(stop_words='english')
     X = vectorizer.fit_transform(sentences)
     svd = TruncatedSVD(n_components=20)
     X_lsa = svd.fit_transform(X)
-    # Get the most important sentences
     scores = np.sum(X_lsa**2, axis=1)
     sentence_order = np.argsort(scores)[::-1]
-    # sentence_order = np.argsort(scores)
-    # reverse_order = np.flipud(sentence_order)
-    summary = '. '.join([sentences[i] for i in sentence_order[:n]])
+    summary = '. '.join([sentences[i] for i in sentence_order[:n]]) +'.'
 
     return summary
 
+def preprocess_text(text):
+    # Remove special characters and digits
+    text = re.sub('[^a-zA-Z]', ' ', text)
+    # Convert to lowercase
+    text = text.lower()
+    # Split into words
+    words = text.split()
+    # Join the words
+    preprocessed_text = ' '.join(words)
+    return preprocessed_text
 
 
 
@@ -182,10 +225,34 @@ def get_summary(request):
     if request.method == 'POST':
         text = request.POST.get('text')
         id = request.POST.get('id')  
+        current_document = collection.find_one({'_id': ObjectId(id)})
+        title=current_document['Title']
+        content=current_document['Content']
+        rnn_text=title+content[:3]
+        #summarize
         preprocess = text_preprocess(text)
         prediction = summarize(preprocess,5)
+        #classify
+        pickled_model = pickle.load(open('./demoapp/ML_models/model.pkl', 'rb'))
+        pickled_vectorizer = pickle.load(open('./demoapp/ML_models/vectorizer.pkl', 'rb'))
+        classify_text = pickled_vectorizer.transform([title]).toarray()
+        result=pickled_model.predict(classify_text)
+        arr = result
+        classify = arr[0].strip()
+        #using lstm
+        rnn_model = tf.keras.models.load_model('./demoapp/ML_models/model.hdf5')
+        rnn_model.load_weights('./demoapp/ML_models/modelweight.h5')
+        pickled_token = pickle.load(open('./demoapp/ML_models/token.pkl', 'rb'))
+        labels = ['Business News', 'Sports News', 'World News', 'Science-Technology News']
+        test_seq = pad_sequences(pickled_token.texts_to_sequences(rnn_text), maxlen=177)
+        test_preds = [labels[np.argmax(i)] for i in rnn_model.predict(test_seq)]
+        for  label in zip( test_preds):
+            category_rnn=label
+            category_rnn = category_rnn[0].strip()
+
+
+        # recommend
         similarity_score=sim_score(contents)
-        # print(similarity_score)
         index = ids.index(id)
         scores = list(enumerate(similarity_score[index]))
         scores_sorted = sorted(scores, key=lambda x: x[1], reverse=True)
@@ -196,7 +263,7 @@ def get_summary(request):
             recommended_article = collection.find_one({'_id': ObjectId(recommended_id)})
             recommended_articles.append(recommended_article)
 
-        context = {'text': text,'prediction':prediction,'recommendation':recommended_articles}
+        context = {'text': text,'prediction':prediction,'recommendation':recommended_articles,'title':title,'classify':classify,'category_rnn':category_rnn}
       
         
     return render(request, 'summarizerpage.html',context)
@@ -212,7 +279,13 @@ def SummarizeOwn(request):
         if request.method == 'POST':
             text = request.POST.get('file_text')
             preprocess = text_preprocess(text)
-            prediction = summarize(preprocess,10)
+            prediction = summarize(preprocess,8)
+            # pickled_model = pickle.load(open('./demoapp/ML_models/model.pkl', 'rb'))
+            # pickled_vectorizer = pickle.load(open('./demoapp/ML_models/vectorizer.pkl', 'rb'))
+            # classify_text = pickled_vectorizer.transform([text]).toarray()
+            # result=pickled_model.predict(classify_text)
+            # arr = result
+            # classify = arr[0].strip()
             
             # print(preprocess)
             # print(prediction)
