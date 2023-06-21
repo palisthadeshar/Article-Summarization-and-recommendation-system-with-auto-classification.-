@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{% static 'summarizepage.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <title>summarize</title>
+    <title>ArticleExplorer</title>
 </head>
 <body>
   {% include 'navbar.html' %}
@@ -19,7 +19,7 @@
             <div class="form" class="col-md-6">
                 <div class="Summarize">
                   <div class="header">
-                    <h3>{{summarypage.Title}}</h3>
+                    <h3 style="color: white;">Upload Your text document here!!!</h3>
                  
                   </div>
                 </div>
@@ -36,8 +36,8 @@
                         <div class="part-1">
                         <form action="/upload" method="post" enctype="multipart/form-data">
                         
-                          <input type="file" id="file-upload" name="file-upload">
-                          <input type="button" value="Upload" onclick="getFileText()">
+                          <input type="file" id="file-upload" name="file-upload" style="background: none; margin-top: -10px;">
+                          <input type="button" value="Upload" onclick="getFileText()" style="background-image: linear-gradient(147deg, #3586c4,	#F0F8FF); border-radius: 50px;">
                         </form>
                         </div>
                       </div>
@@ -55,15 +55,15 @@
           <div class="form" class="col-md-6">
             <div class="Summarize">
               <div class="header">
-                <h3>Your summary</h3>
+                <h4 style="color: white;">Your summary</h4>
                 
               </div>
             </div>
             <form>
               {% csrf_token %}
                 <textarea>{{prediction}}</textarea>
-                <p>Labels:</p>
-                <input type="text"/>
+                <!-- <p>Labels:{{classify}}</p> -->
+                <!-- <input type="text"/> -->
              
              
               
